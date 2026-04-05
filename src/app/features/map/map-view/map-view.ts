@@ -1,5 +1,6 @@
 import { Component, OnInit, signal } from '@angular/core'
 import * as L from 'leaflet'
+import { ParksService } from '../../../core/services/parks'
 
 @Component({
   selector: 'app-map-view',
@@ -10,6 +11,8 @@ import * as L from 'leaflet'
 export class MapView implements OnInit {
   map!: L.Map
   userPosition = signal<{ lat: number; lng: number } | null>(null)
+
+  constructor(private parksService: ParksService) {}
 
   ngOnInit() {
     this.initMap()
@@ -34,11 +37,21 @@ export class MapView implements OnInit {
     navigator.geolocation.getCurrentPosition(pos => {
       const { latitude, longitude } = pos.coords
 
+      // Mise à jour du signal
       this.userPosition.set({ lat: latitude, lng: longitude })
 
+      // Centrage de la carte
       this.map.setView([latitude, longitude], 15)
 
+      // Marqueur utilisateur
       L.marker([latitude, longitude]).addTo(this.map).bindPopup('Vous êtes ici').openPopup()
+
+      // Récupération des parcs
+      this.parksService.getParksAround(latitude, longitude).subscribe(parks => {
+        parks.forEach(park => {
+          L.marker([park.lat, park.lng]).addTo(this.map).bindPopup(`<b>${park.name}</b>`)
+        })
+      })
     })
   }
 }
