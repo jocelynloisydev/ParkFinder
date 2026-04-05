@@ -1,6 +1,14 @@
-import { Component, OnInit, signal } from '@angular/core'
+import { Component, effect, OnInit, signal } from '@angular/core'
 import * as L from 'leaflet'
+import { Icon } from 'leaflet'
 import { ParksService } from '../../../core/services/parks'
+
+// Correction des icônes Leaflet
+Icon.Default.mergeOptions({
+  iconRetinaUrl: 'assets/marker-icon-2x.png',
+  iconUrl: 'assets/marker-icon.png',
+  shadowUrl: 'assets/marker-shadow.png',
+})
 
 @Component({
   selector: 'app-map-view',
@@ -14,6 +22,24 @@ export class MapView implements OnInit {
 
   constructor(private parksService: ParksService) {}
 
+  // Effect pour centrer la carte sur un parc sélectionné
+  selectedEffect = effect(() => {
+    const selected = this.parksService.selectedPark()
+    if (selected) {
+      this.map.setView([selected.lat, selected.lng], 17)
+    }
+  })
+
+  // Effect pour afficher les parcs sur la carte
+  parksEffect = effect(() => {
+    const parks = this.parksService.parks()
+    if (!this.map) return
+
+    parks.forEach(park => {
+      L.marker([park.lat, park.lng]).addTo(this.map).bindPopup(`<b>${park.name}</b>`)
+    })
+  })
+
   ngOnInit() {
     this.initMap()
     this.locateUser()
@@ -21,7 +47,7 @@ export class MapView implements OnInit {
 
   initMap() {
     this.map = L.map('map', {
-      center: [46.67, 5.22], // Louhans par défaut
+      center: [46.67, 5.22],
       zoom: 13,
     })
 
@@ -46,12 +72,8 @@ export class MapView implements OnInit {
       // Marqueur utilisateur
       L.marker([latitude, longitude]).addTo(this.map).bindPopup('Vous êtes ici').openPopup()
 
-      // Récupération des parcs
-      this.parksService.getParksAround(latitude, longitude).subscribe(parks => {
-        parks.forEach(park => {
-          L.marker([park.lat, park.lng]).addTo(this.map).bindPopup(`<b>${park.name}</b>`)
-        })
-      })
+      // Récupération des parcs, charge les parcs dans le signal
+      this.parksService.loadParks(latitude, longitude)
     })
   }
 }

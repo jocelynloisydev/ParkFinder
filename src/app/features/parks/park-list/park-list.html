@@ -1,1 +1,8 @@
-<p>park-list works!</p>
+<mat-list>
+  <mat-list-item
+    *ngFor="let park of parksService.parks()"
+    (click)="selectPark(park)"
+  >
+    {{ park.name }}
+  </mat-list-item>
+</mat-list>
