@@ -3,11 +3,25 @@ import * as L from 'leaflet'
 import { Icon } from 'leaflet'
 import { ParksService } from '../../../core/services/parks'
 
-// Correction des icônes Leaflet
+/* Correction des icônes Leaflet
 Icon.Default.mergeOptions({
   iconRetinaUrl: 'assets/marker-icon-2x.png',
   iconUrl: 'assets/marker-icon.png',
   shadowUrl: 'assets/marker-shadow.png',
+})*/
+
+const parkIcon = L.icon({
+  iconUrl: 'assets/icons/parc-icon.png',
+  iconSize: [32, 32],
+  iconAnchor: [16, 32],
+  popupAnchor: [0, -32],
+})
+
+const userIcon = L.icon({
+  iconUrl: 'assets/icons/user-icon.png',
+  iconSize: [32, 32],
+  iconAnchor: [16, 32],
+  popupAnchor: [0, -32],
 })
 
 @Component({
@@ -36,7 +50,7 @@ export class MapView implements OnInit {
     if (!this.map) return
 
     parks.forEach(park => {
-      L.marker([park.lat, park.lng]).addTo(this.map).bindPopup(`<b>${park.name}</b>`)
+      L.marker([park.lat, park.lng], { icon: parkIcon }).addTo(this.map).bindPopup(`<b>${park.name}</b>`)
     })
   })
 
@@ -70,7 +84,7 @@ export class MapView implements OnInit {
       this.map.setView([latitude, longitude], 15)
 
       // Marqueur utilisateur
-      L.marker([latitude, longitude]).addTo(this.map).bindPopup('Vous êtes ici').openPopup()
+      L.marker([latitude, longitude], { icon: userIcon }).addTo(this.map).bindPopup('Vous êtes ici').openPopup()
 
       // Récupération des parcs, charge les parcs dans le signal
       this.parksService.loadParks(latitude, longitude)
