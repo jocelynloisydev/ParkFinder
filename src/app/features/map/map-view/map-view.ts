@@ -15,6 +15,7 @@ export class MapView implements OnInit {
   map!: google.maps.Map
   userPosition = signal<{ lat: number; lng: number } | null>(null)
   markers: google.maps.marker.AdvancedMarkerElement[] = []
+  infoWindow!: google.maps.InfoWindow
 
   constructor(private parksService: ParksService) {}
 
@@ -23,7 +24,7 @@ export class MapView implements OnInit {
     const selected = this.parksService.selectedPark()
     if (selected && this.map) {
       this.map.setCenter({ lat: selected.lat, lng: selected.lng })
-      this.map.setZoom(17)
+      this.map.setZoom(16)
     }
   })
 
@@ -43,12 +44,9 @@ export class MapView implements OnInit {
         content: this.createCustomIcon('assets/icons/parc-icon.png'),
       })
 
-      const info = new google.maps.InfoWindow({
-        content: `<b>${park.name}</b><br>${park.address ?? ''}`,
-      })
-
-      marker.addListener('click', () => {
-        info.open(this.map, marker)
+      marker.addListener('gmp-click', () => {
+        this.infoWindow.setContent(`<b>${park.name}</b><br>${park.address ?? ''}`)
+        this.infoWindow.open(this.map, marker)
         this.parksService.selectPark(park)
       })
 
@@ -59,6 +57,7 @@ export class MapView implements OnInit {
   async ngOnInit() {
     await loadGoogleMaps('AIzaSyB67K1gwK2TTDQTytXdRL1qK-TdVertlms')
     this.initMap()
+    this.infoWindow = new google.maps.InfoWindow()
     this.locateUser()
   }
 
