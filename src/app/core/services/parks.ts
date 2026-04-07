@@ -1,7 +1,4 @@
 import { Injectable, signal } from '@angular/core'
-import { loadGoogleMaps } from '../utils/google-maps-loader';
-
-declare const google: any
 
 @Injectable({
   providedIn: 'root',
@@ -11,23 +8,36 @@ export class ParksService {
   selectedPark = signal<any | null>(null)
 
   async loadParks(lat: number, lng: number) {
-    await loadGoogleMaps('AIzaSyB67K1gwK2TTDQTytXdRL1qK-TdVertlms')
+    const apiKey = 'AIzaSyB67K1gwK2TTDQTytXdRL1qK-TdVertlms'
 
-    const { places } = await google.maps.places.searchNearby({
+    const url = `https://places.googleapis.com/v1/places:searchNearby`
+
+    const body = {
+      includedTypes: ['park'],
+      maxResultCount: 20,
       locationRestriction: {
         circle: {
-          center: { lat, lng },
+          center: { latitude: lat, longitude: lng },
           radius: 2000,
         },
       },
-      includedTypes: ['park'],
-      maxResultCount: 20,
-      language: 'fr',
-      region: 'FR',
+    }
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Goog-Api-Key': apiKey,
+        'X-Goog-FieldMask':
+          'places.id,places.displayName,places.location,places.formattedAddress,places.rating',
+      },
+      body: JSON.stringify(body),
     })
 
+    const data = await response.json()
+
     this.parks.set(
-      places.map((p: any) => ({
+      (data.places ?? []).map((p: any) => ({
         id: p.id,
         name: p.displayName?.text,
         lat: p.location?.latitude,
