@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router'
 import { Shell } from './layout/shell/shell'
+import { authGuard } from './core/guards/auth'
 
 export const routes: Routes = [
   {
@@ -8,6 +9,7 @@ export const routes: Routes = [
     children: [
       {
         path: '',
+        canActivate: [authGuard],
         loadComponent: () => import('./features/map/map-view/map-view').then(m => m.MapView),
       },
       {
@@ -35,6 +37,11 @@ export const routes: Routes = [
       {
         path: 'profile',
         loadComponent: () => import('./features/auth/profile/profile').then(m => m.Profile),
+      },
+      {
+        path: 'map',
+        canActivate: [authGuard],
+        loadComponent: () => import('./features/map/map-view/map-view').then(m => m.MapView),
       },
     ],
   },

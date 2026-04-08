@@ -1,1 +1,11 @@
-<p>login works!</p>
+<h2>Connexion</h2>
+
+<input type="email" [(ngModel)]="email" placeholder="Email" />
+<input type="password" [(ngModel)]="password" placeholder="Mot de passe" />
+
+<button (click)="submit()">Se connecter</button>
+
+<!-- Bouton inscription -->
+<button routerLink="/register">Créer un compte</button>
+
+<p *ngIf="error">{{ error }}</p>
