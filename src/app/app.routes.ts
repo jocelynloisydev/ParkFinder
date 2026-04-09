@@ -3,46 +3,51 @@ import { Shell } from './layout/shell/shell'
 import { authGuard } from './core/guards/auth'
 
 export const routes: Routes = [
+  // Layout Auth (login/register)
   {
     path: '',
-    component: Shell,
     children: [
       {
-        path: '',
-        canActivate: [authGuard],
-        loadComponent: () => import('./features/map/map-view/map-view').then(m => m.MapView),
-      },
-      {
-        path: 'parks',
-        loadComponent: () => import('./features/parks/park-list/park-list').then(m => m.ParkList),
-      },
-      {
-        path: 'parks/:id',
-        loadComponent: () =>
-          import('./features/parks/park-details/park-details').then(m => m.ParkDetails),
-      },
-      {
-        path: 'favorites',
-        loadComponent: () =>
-          import('./features/favorites/favorites-page/favorites-page').then(m => m.FavoritesPage),
-      },
-      {
         path: 'login',
-        loadComponent: () => import('./features/auth/login/login').then(m => m.Login),
+        loadComponent: () =>
+          import('./features/auth/auth-layout/auth-layout').then(m => m.AuthLayout),
+        children: [
+          {
+            path: '',
+            loadComponent: () => import('./features/auth/login/login').then(m => m.Login),
+          },
+        ],
       },
       {
         path: 'register',
-        loadComponent: () => import('./features/auth/register/register').then(m => m.Register),
+        loadComponent: () =>
+          import('./features/auth/auth-layout/auth-layout').then(m => m.AuthLayout),
+        children: [
+          {
+            path: '',
+            loadComponent: () => import('./features/auth/register/register').then(m => m.Register),
+          },
+        ],
       },
-      {
-        path: 'profile',
-        loadComponent: () => import('./features/auth/profile/profile').then(m => m.Profile),
-      },
+    ],
+  },
+
+  // Layout Shell (navbar + footer + map)
+  {
+    path: '',
+    loadComponent: () => import('./layout/shell/shell').then(m => m.Shell),
+    canActivate: [authGuard],
+    children: [
       {
         path: 'map',
-        canActivate: [authGuard],
         loadComponent: () => import('./features/map/map-view/map-view').then(m => m.MapView),
+      },
+      {
+        path: '',
+        redirectTo: 'map',
+        pathMatch: 'full',
       },
     ],
   },
 ]
+

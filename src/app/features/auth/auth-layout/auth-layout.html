@@ -1,0 +1,31 @@
+<div class="auth-container">
+
+  <!-- Menu latéral -->
+  <aside class="sidebar">
+    <h1 class="logo">ParkFinder</h1>
+
+    <nav class="menu">
+      <a routerLink="/login" routerLinkActive="active">Connexion</a>
+      <a routerLink="/register" routerLinkActive="active">Inscription</a>
+      <a>Créez un compte professionnel</a>
+      <a>Ajoutez votre parc</a>
+      <a>Devenez partenaire</a>
+    </nav>
+
+    <div class="app-links">
+      <p class="title">ParkFinder</p>
+      <span class="subtitle">Plus de fonctionnalités dans l'application.</span>
+
+      <div class="stores">
+        <button class="store-btn">iPhone</button>
+        <button class="store-btn">Android</button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Contenu dynamique (login/register) -->
+  <main class="content">
+    <router-outlet></router-outlet>
+  </main>
+
+</div>

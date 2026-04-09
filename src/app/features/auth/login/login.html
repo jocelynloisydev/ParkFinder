@@ -1,11 +1,16 @@
-<h2>Connexion</h2>
+<div class="auth-card">
+  <h2>Connexion</h2>
 
-<input type="email" [(ngModel)]="email" placeholder="Email" />
-<input type="password" [(ngModel)]="password" placeholder="Mot de passe" />
+  <input type="email" [(ngModel)]="email" placeholder="Adresse email" />
+  <input type="password" [(ngModel)]="password" placeholder="Mot de passe" />
 
-<button (click)="submit()">Se connecter</button>
+  <button class="primary" (click)="submit()">Se connecter</button>
 
-<!-- Bouton inscription -->
-<button routerLink="/register">Créer un compte</button>
+  <!-- Bouton inscription -->
+  <button class="secondary" routerLink="/register">
+    Créer un compte
+  </button>
 
-<p *ngIf="error">{{ error }}</p>
+  <p *ngIf="error" class="error">{{ error }}</p>
+</div>
+
