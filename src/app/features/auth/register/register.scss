@@ -1,46 +1,39 @@
+@import "variables";
+@import "mixins";
+
 .auth-card {
-  background: white;
-  padding: 2rem;
-  border-radius: 12px;
+  @include card;
   width: 380px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
 }
 
 h2 {
-  margin-bottom: 1.5rem;
-  color: #0047AB;
+  margin-bottom: $space-lg;
+  color: $color-primary;
 }
 
 input {
   width: 100%;
-  padding: 0.9rem;
-  margin-bottom: 1rem;
-  border-radius: 8px;
-  border: 1px solid #ccc;
+  padding: $space-md;
+  margin-bottom: $space-md;
+  border-radius: $radius;
+  border: 1px solid $color-grey;
+  font-size: 1rem;
 }
 
 button.primary {
   width: 100%;
-  padding: 1rem;
-  background: #FF7A00;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  margin-bottom: 1rem;
-  cursor: pointer;
+  padding: $space-md;
+  @include button-primary;
+  margin-bottom: $space-md;
 }
 
 button.secondary {
   width: 100%;
-  padding: 1rem;
-  background: transparent;
-  border: 2px solid #0047AB;
-  color: #0047AB;
-  border-radius: 8px;
-  cursor: pointer;
+  padding: $space-md;
+  @include button-outline;
 }
 
 .error {
-  margin-top: 1rem;
+  margin-top: $space-md;
   color: red;
 }
