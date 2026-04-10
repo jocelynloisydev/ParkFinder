@@ -1,3 +1,4 @@
+/*
 import { Component, inject } from '@angular/core'
 import { NgFor } from '@angular/common'
 import { ParksService } from '../../../core/services/parks'
@@ -16,3 +17,4 @@ export class ParkList {
     this.parksService.selectPark(park)
   }
 }
+*/
