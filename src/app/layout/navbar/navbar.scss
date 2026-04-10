@@ -28,3 +28,9 @@
     background: rgba($color-white, 0.1);
   }
 }
+
+.left {
+  display: flex;
+  align-items: center;
+  gap: $space-md; // espace entre le bouton et le titre
+}

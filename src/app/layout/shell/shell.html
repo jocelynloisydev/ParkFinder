@@ -1,4 +1,6 @@
-<app-navbar></app-navbar>
+<app-navbar (menuHover)="sidebar.openSidebar()"></app-navbar>
+
+<app-sidebar #sidebar></app-sidebar>
 
 <main class="shell-content">
   <router-outlet></router-outlet>

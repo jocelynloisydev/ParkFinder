@@ -1,0 +1,14 @@
+<aside class="sidebar"
+       [class.open]="isOpen"
+       (mouseleave)="closeSidebar()">
+
+  <h2 class="logo">ParkFinder</h2>
+
+  <nav class="menu">
+    <a routerLink="/map">Carte</a>
+    <a routerLink="/favorites">Favoris</a>
+    <a routerLink="/profile">Profil</a>
+    <a routerLink="/settings">Paramètres</a>
+  </nav>
+
+</aside>

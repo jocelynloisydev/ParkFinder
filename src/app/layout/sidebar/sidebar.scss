@@ -1,0 +1,40 @@
+@import 'variables';
+@import 'mixins';
+
+.sidebar {
+  position: fixed;
+  top: $navbar-height;
+  left: 0;
+  width: 280px;
+  height: calc(100vh - #{$navbar-height});
+  background: $color-primary;
+  color: $color-white;
+  padding: $space-xl $space-lg;
+  transform: translateX(-100%);
+  transition: transform 0.3s ease;
+  z-index: 20;
+
+  &.open {
+    transform: translateX(0);
+  }
+}
+
+.logo {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin-bottom: $space-xl;
+  color: $color-white;
+}
+
+.menu a {
+  display: block;
+  margin-bottom: $space-md;
+  color: $color-white;
+  text-decoration: none;
+  font-size: 1.1rem;
+  transition: 0.2s;
+
+  &:hover {
+    color: $color-secondary;
+  }
+}
