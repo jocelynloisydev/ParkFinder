@@ -1,0 +1,46 @@
+@import 'variables';
+
+// 🧩 Carte
+@mixin card {
+  background: $color-white;
+  border-radius: $radius;
+  box-shadow: $shadow-soft;
+  padding: $space-lg;
+}
+
+// 🔘 Bouton principal
+@mixin button-primary {
+  background: $color-secondary;
+  color: $color-white;
+  border: none;
+  border-radius: $radius;
+  padding: $space-md $space-lg;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.2s;
+  &:hover {
+    background: darken($color-secondary, 10%);
+  }
+}
+
+// 🔘 Bouton outline
+@mixin button-outline {
+  background: transparent;
+  border: 2px solid $color-primary;
+  color: $color-primary;
+  border-radius: $radius;
+  padding: $space-md $space-lg;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.2s;
+  &:hover {
+    background: rgba($color-primary, 0.1);
+  }
+}
+
+// 🎯 Flex center
+@mixin flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

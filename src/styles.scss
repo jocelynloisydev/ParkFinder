@@ -37,4 +37,10 @@ body {
   height: 100%;
 }
 /* You can add global styles to this file, and also import other style files */
-@import "leaflet/dist/leaflet.css";
+
+//@import "leaflet/dist/leaflet.css";
+
+@import 'styles/variables';
+@import 'styles/mixins';
+@import 'styles/reset';
+@import 'styles/typography';

@@ -1,0 +1,17 @@
+@import 'variables';
+
+body {
+  font-family: $font-base;
+  font-size: $font-size-base;
+  color: $color-black;
+  background: $color-bg;
+}
+
+h1, h2, h3, h4 {
+  font-weight: 700;
+  color: $color-primary;
+}
+
+p {
+  line-height: 1.6;
+}
