@@ -1,1 +1,11 @@
-<button *ngIf="auth.user()" (click)="logout()">Déconnexion</button>
+<nav class="navbar">
+  <div class="left">
+    <h1 class="app-title">ParkFinder</h1>
+  </div>
+
+  <div class="right">
+    <button *ngIf="auth.user()" class="logout-btn" (click)="logout()">
+      Déconnexion
+    </button>
+  </div>
+</nav>
