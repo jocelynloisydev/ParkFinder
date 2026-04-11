@@ -1,0 +1,86 @@
+@import 'variables';
+@import 'mixins';
+
+.auth-container {
+  display: flex;
+  height: 100vh;
+  background: $color-bg;
+  overflow: hidden;
+}
+
+/* Menu latéral */
+.sidebar {
+  width: 320px;
+  background: $color-primary;
+  color: $color-white;
+  padding: $space-xl;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.logo {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: $space-xl;
+  color: $color-white;
+}
+
+.menu a {
+  display: block;
+  margin-bottom: $space-md;
+  color: $color-white;
+  font-size: 1.1rem;
+  text-decoration: none;
+  transition: 0.2s;
+}
+
+.menu a:hover {
+  color: $color-secondary;
+}
+
+.menu a.active {
+  color: $color-secondary;
+  font-weight: 600;
+}
+
+.app-links .title {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.app-links .subtitle {
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
+.stores {
+  margin-top: $space-md;
+  display: flex;
+  gap: $space-sm;
+}
+
+.store-btn {
+  flex: 1;
+  padding: $space-sm;
+  border-radius: $radius;
+  border: none;
+  background: $color-secondary;
+  color: $color-white;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.2s;
+}
+
+.store-btn:hover {
+  background: darken($color-secondary, 10%);
+}
+
+/* Panneau central */
+.content {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: $space-xl;
+}

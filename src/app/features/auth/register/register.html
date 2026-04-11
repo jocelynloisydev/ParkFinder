@@ -1,0 +1,15 @@
+<div class="auth-card">
+  <h2>Créer un compte</h2>
+
+  <input type="email" [(ngModel)]="email" placeholder="Email" />
+  <input type="password" [(ngModel)]="password" placeholder="Mot de passe" />
+
+  <button class="primary" (click)="submit()">Créer un compte</button>
+
+  <button class="secondary" routerLink="/login">Déjà un compte ? Se connecter</button>
+
+  <p *ngIf="error">{{ error }}</p>
+</div>
+
+
+

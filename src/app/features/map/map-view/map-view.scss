@@ -1,0 +1,6 @@
+@import "variables";
+
+#map {
+  height: calc(100vh - #{$navbar-height} - #{$footer-height}); // Ajuste selon la navbar et le footer
+  width: 100%;
+}

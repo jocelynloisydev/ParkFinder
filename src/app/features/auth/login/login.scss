@@ -1,0 +1,39 @@
+@import "variables";
+@import "mixins";
+
+.auth-card {
+  @include card;
+  width: 380px;
+}
+
+.auth-card h2 {
+  margin-bottom: $space-lg;
+  color: $color-primary;
+}
+
+input {
+  width: 100%;
+  padding: $space-md;
+  margin-bottom: $space-md;
+  border-radius: $radius;
+  border: 1px solid $color-grey;
+  font-size: 1rem;
+}
+
+button.primary {
+  width: 100%;
+  padding: $space-md;
+  @include button-primary;
+  margin-bottom: $space-md;
+}
+
+button.secondary {
+  width: 100%;
+  padding: $space-md;
+  @include button-outline;
+}
+
+.error {
+  margin-top: $space-md;
+  color: red;
+}

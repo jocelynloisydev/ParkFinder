@@ -1,0 +1,13 @@
+@import "variables";
+
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.shell-content {
+  flex: 1;
+  overflow: hidden;
+  padding: 0 $space-lg;
+}
