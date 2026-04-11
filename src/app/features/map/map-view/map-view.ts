@@ -1,6 +1,7 @@
 import { Component, effect, OnInit, signal } from '@angular/core'
 import { ParksService } from '../../../core/services/parks'
 import { loadGoogleMaps } from '../../../core/utils/google-maps-loader';
+import { environment } from '../../../../environments/environment'
 
 /// <reference types="@types/google.maps" />
 declare const google: any
@@ -55,7 +56,7 @@ export class MapView implements OnInit {
   })
 
   async ngOnInit() {
-    await loadGoogleMaps('AIzaSyB67K1gwK2TTDQTytXdRL1qK-TdVertlms')
+    await loadGoogleMaps(environment.google.mapsApiKey)
     this.initMap()
     this.infoWindow = new google.maps.InfoWindow()
     this.locateUser()

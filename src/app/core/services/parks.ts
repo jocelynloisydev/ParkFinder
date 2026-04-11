@@ -1,4 +1,5 @@
 import { Injectable, signal } from '@angular/core'
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
@@ -8,7 +9,7 @@ export class ParksService {
   selectedPark = signal<any | null>(null)
 
   async loadParks(lat: number, lng: number) {
-    const apiKey = 'AIzaSyB67K1gwK2TTDQTytXdRL1qK-TdVertlms'
+    const apiKey = environment.google.placesApiKey
 
     const url = `https://places.googleapis.com/v1/places:searchNearby`
 
