@@ -1,9 +1,10 @@
 @import 'variables';
 @import 'mixins';
 
+/* Layout global */
 .auth-container {
   display: flex;
-  height: 100vh;
+  height: 100dvh;
   background: $color-bg;
   overflow: hidden;
 }
@@ -83,4 +84,57 @@
   justify-content: center;
   align-items: center;
   padding: $space-xl;
+}
+
+/* Header mobile */
+.mobile-header {
+  display: none;
+  width: 100%;
+  padding: $space-lg;
+  background: $color-primary;
+  color: $color-white;
+  text-align: left;
+}
+
+.mobile-logo {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin: 0;
+  color: $color-white;
+}
+
+/* Responsive mobile */
+@media (max-width: 768px) {
+
+  /* Sidebar cachée */
+  .sidebar {
+    display: none;
+  }
+
+  /* Header mobile visible */
+  .mobile-header {
+    display: flex;
+    align-items: center;
+  }
+
+  /* Layout vertical */
+  .auth-container {
+    flex-direction: column;
+    height: 100dvh;
+  }
+
+  /* Contenu centré */
+  .content {
+    padding: $space-lg;
+    align-items: center;
+    justify-content: flex-start;
+    flex-direction: column;
+  }
+
+  /* Formulaires Login/Register */
+  .content > * {
+    width: 100%;
+    max-width: 90%;
+    margin: $space-lg auto 0;
+  }
 }
