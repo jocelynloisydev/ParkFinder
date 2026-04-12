@@ -1,13 +1,25 @@
 @import "variables";
 
+/* Layout global */
 :host {
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  height: 100dvh; /* Fixe le problème mobile */
 }
 
+/* Zone centrale */
 .shell-content {
   flex: 1;
   overflow: hidden;
   padding: 0 $space-lg;
+  height: calc(100dvh - $navbar-height - $footer-height);
+}
+
+/* Responsive mobile */
+
+@media (max-width: 768px) {
+
+  .shell-content {
+    padding: 0; /* map en pleine largeur */
+  }
 }

@@ -71,6 +71,13 @@ export class MapView implements OnInit {
         mapId: 'DEMO_MAP_ID',
       }
     )
+
+    // Fix du resize / zoom initial
+    google.maps.event.addListenerOnce(this.map, 'idle', setTimeout(() => {
+      const center = this.map.getCenter();
+      google.maps.event.trigger(this.map, 'resize');
+      if (center) this.map.setCenter(center);
+    }, 300));
   }
 
   locateUser() {
