@@ -57,9 +57,15 @@ export class MapView implements OnInit {
 
   async ngOnInit() {
     await loadGoogleMaps(environment.google.mapsApiKey)
-    this.initMap()
-    this.infoWindow = new google.maps.InfoWindow()
-    this.locateUser()
+
+    // Attendre que le layout soit stabilisé
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        this.initMap();
+        this.infoWindow = new google.maps.InfoWindow();
+        this.locateUser();
+      });
+    });
   }
 
   initMap() {
