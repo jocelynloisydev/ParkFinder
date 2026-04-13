@@ -56,16 +56,26 @@ export class MapView implements OnInit {
   })
 
   async ngOnInit() {
-    await loadGoogleMaps(environment.google.mapsApiKey)
+    try {
+      await loadGoogleMaps(environment.google.mapsApiKey)
 
-    // Attendre que le layout soit stabilisé
-    requestAnimationFrame(() => {
+      // Attendre que le layout soit stabilisé
       requestAnimationFrame(() => {
-        this.initMap();
-        this.infoWindow = new google.maps.InfoWindow();
-        this.locateUser();
+        requestAnimationFrame(() => {
+          const mapEl = document.getElementById('map')
+          if (!mapEl) {
+            console.error('Map container not found')
+            return
+          }
+
+          this.initMap();
+          this.infoWindow = new google.maps.InfoWindow();
+          this.locateUser();
+        });
       });
-    });
+    } catch (err) {
+      console.error('Google Maps failed to load:', err)
+    }
   }
 
   initMap() {
@@ -115,10 +125,15 @@ export class MapView implements OnInit {
   }
 
   private forceMapStabilization() {
+    if (!this.map) return
+
     const center = this.map.getCenter();
     google.maps.event.trigger(this.map, 'resize');
+
     if (center) this.map.setCenter(center);
-    this.map.setZoom(<number>this.map.getZoom());
+
+    const zoom = this.map.getZoom()
+    if (zoom) this.map.setZoom(zoom)
   }
 
   // Génère un élément HTML pour les icônes personnalisées
