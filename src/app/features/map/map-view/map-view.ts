@@ -73,11 +73,13 @@ export class MapView implements OnInit {
     )
 
     // Fix du resize / zoom initial
-    google.maps.event.addListenerOnce(this.map, 'idle', setTimeout(() => {
-      const center = this.map.getCenter();
-      google.maps.event.trigger(this.map, 'resize');
-      if (center) this.map.setCenter(center);
-    }, 300));
+    google.maps.event.addListenerOnce(this.map, 'idle', () => {
+      this.forceMapStabilization();
+    });
+    setTimeout(() => this.forceMapStabilization(), 300)
+    window.addEventListener('resize', () => {
+      this.forceMapStabilization()
+    })
   }
 
   locateUser() {
@@ -104,6 +106,13 @@ export class MapView implements OnInit {
       // Récupération des parcs, charge les parcs dans le signal
       this.parksService.loadParks(latitude, longitude)
     })
+  }
+
+  private forceMapStabilization() {
+    const center = this.map.getCenter();
+    google.maps.event.trigger(this.map, 'resize');
+    if (center) this.map.setCenter(center);
+    this.map.setZoom(<number>this.map.getZoom());
   }
 
   // Génère un élément HTML pour les icônes personnalisées
