@@ -68,31 +68,28 @@ export class MapView implements OnInit {
             return
           }
 
-          this.initMap();
-          this.infoWindow = new google.maps.InfoWindow();
-          this.locateUser();
-        });
-      });
+          this.initMap()
+          this.infoWindow = new google.maps.InfoWindow()
+          this.locateUser()
+        })
+      })
     } catch (err) {
       console.error('Google Maps failed to load:', err)
     }
   }
 
   initMap() {
-    this.map = new google.maps.Map(
-      document.getElementById('map') as HTMLElement,
-      {
-        center: { lat: 46.67, lng: 5.22 },
-        zoom: 13,
-        mapId: 'DEMO_MAP_ID',
-      }
-    )
+    this.map = new google.maps.Map(document.getElementById('map') as HTMLElement, {
+      center: { lat: 46.67, lng: 5.22 },
+      zoom: 13,
+      mapId: 'DEMO_MAP_ID',
+    })
 
     // Fix du resize / zoom initial
     google.maps.event.addListenerOnce(this.map, 'idle', () => {
-      this.forceMapStabilization();
-    });
-    setTimeout(() => this.forceMapStabilization(), 300)
+      setTimeout(() => this.rebuildMap(), 200)
+    })
+
     window.addEventListener('resize', () => {
       this.forceMapStabilization()
     })
@@ -124,13 +121,25 @@ export class MapView implements OnInit {
     })
   }
 
+  private rebuildMap() {
+    const center = this.map.getCenter()
+    const zoom = this.map.getZoom()
+
+    // Détruit la map
+    this.map = new google.maps.Map(document.getElementById('map') as HTMLElement, {
+      center: center ? { lat: center.lat(), lng: center.lng() } : { lat: 46.67, lng: 5.22 },
+      zoom: zoom ?? 13,
+      mapId: 'DEMO_MAP_ID',
+    })
+  }
+
   private forceMapStabilization() {
     if (!this.map) return
 
-    const center = this.map.getCenter();
-    google.maps.event.trigger(this.map, 'resize');
+    const center = this.map.getCenter()
+    google.maps.event.trigger(this.map, 'resize')
 
-    if (center) this.map.setCenter(center);
+    if (center) this.map.setCenter(center)
 
     const zoom = this.map.getZoom()
     if (zoom) this.map.setZoom(zoom)
