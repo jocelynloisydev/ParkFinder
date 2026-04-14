@@ -25,10 +25,9 @@ export class MapView implements OnInit {
 
   // Détection du mode "Afficher le site de bureau" sur mobile
   private isMobileDesktopMode(): boolean {
-    const ua = navigator.userAgent.toLowerCase()
-    const isMobile = ua.includes('mobile') || ua.includes('android') || ua.includes('iphone')
+    const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0
     const isWide = window.innerWidth > 800
-    return isMobile && isWide
+    return isTouchDevice && isWide
   }
 
   // Effect pour centrer la carte sur un parc sélectionné
