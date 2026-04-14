@@ -66,7 +66,7 @@ export class MapView implements OnInit {
     })
   })
 
-  async ngOnInit() {
+  async ngOnInit(): Promise<void> {
     if (this.isMobileDesktopMode()) {
       this.desktopModeWarning = true
       return
@@ -74,24 +74,27 @@ export class MapView implements OnInit {
 
     try {
       await loadGoogleMaps(environment.google.mapsApiKey)
-
-      // Attendre que le layout soit stabilisé
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          const mapEl = document.getElementById('map')
-          if (!mapEl) {
-            console.error('Map container not found')
-            return
-          }
-
-          this.initMap()
-          this.infoWindow = new google.maps.InfoWindow()
-          this.locateUser()
-        })
-      })
+      this.initMapAfterDomReady()
     } catch (err) {
-      console.error('Google Maps failed to load:', err)
+      console.error('Google Maps failed to load', err)
     }
+  }
+
+  // Attendre que le layout soit stabilisé
+  private initMapAfterDomReady() {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        const mapEl = document.getElementById('map')
+        if (!mapEl) {
+          console.error('Map container not found')
+          return
+        }
+
+        this.initMap()
+        this.infoWindow = new google.maps.InfoWindow()
+        this.locateUser()
+      })
+    })
   }
 
   initMap() {
