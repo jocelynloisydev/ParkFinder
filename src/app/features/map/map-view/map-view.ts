@@ -2,6 +2,7 @@ import { Component, effect, OnInit, signal } from '@angular/core'
 import { ParksService } from '../../../core/services/parks'
 import { loadGoogleMaps } from '../../../core/utils/google-maps-loader';
 import { environment } from '../../../../environments/environment'
+import { NgIf } from '@angular/common';
 
 /// <reference types="@types/google.maps" />
 declare const google: any
@@ -11,14 +12,24 @@ declare const google: any
   standalone: true,
   templateUrl: './map-view.html',
   styleUrl: './map-view.scss',
+  imports: [NgIf],
 })
 export class MapView implements OnInit {
   map!: google.maps.Map
   userPosition = signal<{ lat: number; lng: number } | null>(null)
   markers: google.maps.marker.AdvancedMarkerElement[] = []
   infoWindow!: google.maps.InfoWindow
+  desktopModeWarning = false
 
   constructor(private parksService: ParksService) {}
+
+  // Détection du mode "Afficher le site de bureau" sur mobile
+  private isMobileDesktopMode(): boolean {
+    const ua = navigator.userAgent.toLowerCase()
+    const isMobile = ua.includes('mobile') || ua.includes('android') || ua.includes('iphone')
+    const isWide = window.innerWidth > 800
+    return isMobile && isWide
+  }
 
   // Effect pour centrer la carte sur un parc sélectionné
   selectedEffect = effect(() => {
@@ -56,6 +67,11 @@ export class MapView implements OnInit {
   })
 
   async ngOnInit() {
+    if (this.isMobileDesktopMode()) {
+      this.desktopModeWarning = true
+      return
+    }
+
     try {
       await loadGoogleMaps(environment.google.mapsApiKey)
 
@@ -83,11 +99,6 @@ export class MapView implements OnInit {
       center: { lat: 46.67, lng: 5.22 },
       zoom: 13,
       mapId: 'DEMO_MAP_ID',
-    })
-
-    // Fix du resize / zoom initial
-    google.maps.event.addListenerOnce(this.map, 'idle', () => {
-      setTimeout(() => this.rebuildMap(), 200)
     })
 
     window.addEventListener('resize', () => {
@@ -118,18 +129,6 @@ export class MapView implements OnInit {
 
       // Récupération des parcs, charge les parcs dans le signal
       this.parksService.loadParks(latitude, longitude)
-    })
-  }
-
-  private rebuildMap() {
-    const center = this.map.getCenter()
-    const zoom = this.map.getZoom()
-
-    // Détruit la map
-    this.map = new google.maps.Map(document.getElementById('map') as HTMLElement, {
-      center: center ? { lat: center.lat(), lng: center.lng() } : { lat: 46.67, lng: 5.22 },
-      zoom: zoom ?? 13,
-      mapId: 'DEMO_MAP_ID',
     })
   }
 
