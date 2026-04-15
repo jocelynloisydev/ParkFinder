@@ -1,1 +1,11 @@
-<div id="map"></div>
+<div *ngIf="desktopModeWarning" class="desktop-warning">
+  <h2>Mode bureau non supporté</h2>
+  <p>
+    Le mode “Afficher le site de bureau” n’est pas compatible avec l’affichage de la carte.
+    Veuillez désactiver ce mode dans votre navigateur mobile pour utiliser ParkFinder.
+  </p>
+</div>
+
+<div class="map-container">
+  <div id="map"></div>
+</div>

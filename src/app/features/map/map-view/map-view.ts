@@ -2,6 +2,7 @@ import { Component, effect, OnInit, signal } from '@angular/core'
 import { ParksService } from '../../../core/services/parks'
 import { loadGoogleMaps } from '../../../core/utils/google-maps-loader';
 import { environment } from '../../../../environments/environment'
+import { NgIf } from '@angular/common';
 
 /// <reference types="@types/google.maps" />
 declare const google: any
@@ -11,14 +12,23 @@ declare const google: any
   standalone: true,
   templateUrl: './map-view.html',
   styleUrl: './map-view.scss',
+  imports: [NgIf],
 })
 export class MapView implements OnInit {
   map!: google.maps.Map
   userPosition = signal<{ lat: number; lng: number } | null>(null)
   markers: google.maps.marker.AdvancedMarkerElement[] = []
   infoWindow!: google.maps.InfoWindow
+  desktopModeWarning = false
 
   constructor(private parksService: ParksService) {}
+
+  // Détection du mode "Afficher le site de bureau" sur mobile
+  private isMobileDesktopMode(): boolean {
+    const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0
+    const isWide = window.innerWidth > 800
+    return isTouchDevice && isWide
+  }
 
   // Effect pour centrer la carte sur un parc sélectionné
   selectedEffect = effect(() => {
@@ -55,28 +65,44 @@ export class MapView implements OnInit {
     })
   })
 
-  async ngOnInit() {
-    await loadGoogleMaps(environment.google.mapsApiKey)
-    this.initMap()
-    this.infoWindow = new google.maps.InfoWindow()
-    this.locateUser()
+  async ngOnInit(): Promise<void> {
+    if (this.isMobileDesktopMode()) {
+      this.desktopModeWarning = true
+      return
+    }
+
+    try {
+      await loadGoogleMaps(environment.google.mapsApiKey)
+      this.initMapAfterDomReady()
+    } catch (err) {
+      console.error('Google Maps failed to load', err)
+    }
+  }
+
+  // Attendre que le layout soit stabilisé
+  private initMapAfterDomReady() {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        const mapEl = document.getElementById('map')
+        if (!mapEl) {
+          console.error('Map container not found')
+          return
+        }
+
+        this.initMap()
+        this.infoWindow = new google.maps.InfoWindow()
+        this.locateUser()
+      })
+    })
   }
 
   initMap() {
-    this.map = new google.maps.Map(
-      document.getElementById('map') as HTMLElement,
-      {
-        center: { lat: 46.67, lng: 5.22 },
-        zoom: 13,
-        mapId: 'DEMO_MAP_ID',
-      }
-    )
+    this.map = new google.maps.Map(document.getElementById('map') as HTMLElement, {
+      center: { lat: 46.67, lng: 5.22 },
+      zoom: 13,
+      mapId: 'DEMO_MAP_ID',
+    })
 
-    // Fix du resize / zoom initial
-    google.maps.event.addListenerOnce(this.map, 'idle', () => {
-      this.forceMapStabilization();
-    });
-    setTimeout(() => this.forceMapStabilization(), 300)
     window.addEventListener('resize', () => {
       this.forceMapStabilization()
     })
@@ -109,10 +135,15 @@ export class MapView implements OnInit {
   }
 
   private forceMapStabilization() {
-    const center = this.map.getCenter();
-    google.maps.event.trigger(this.map, 'resize');
-    if (center) this.map.setCenter(center);
-    this.map.setZoom(<number>this.map.getZoom());
+    if (!this.map) return
+
+    const center = this.map.getCenter()
+    google.maps.event.trigger(this.map, 'resize')
+
+    if (center) this.map.setCenter(center)
+
+    const zoom = this.map.getZoom()
+    if (zoom) this.map.setZoom(zoom)
   }
 
   // Génère un élément HTML pour les icônes personnalisées

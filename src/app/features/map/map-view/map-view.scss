@@ -4,3 +4,22 @@
   height: 100%;
   width: 100%;
 }
+
+.map-container {
+  height: 100dvh;
+  width: 100%;
+  display: block;
+}
+
+.desktop-warning {
+  padding: 20px;
+  text-align: center;
+  font-size: 16px;
+  color: #333;
+
+  h2 {
+    margin-bottom: 12px;
+    font-size: 20px;
+    font-weight: 600;
+  }
+}
