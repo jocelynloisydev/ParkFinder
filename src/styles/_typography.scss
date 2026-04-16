@@ -3,13 +3,13 @@
 body {
   font-family: $font-base;
   font-size: $font-size-base;
-  color: $color-black;
-  background: $color-bg;
+  color: var(--color-text);
+  background: var(--color-bg);
 }
 
 h1, h2, h3, h4 {
   font-weight: 700;
-  color: $color-primary;
+  color: var(--color-primary);
 }
 
 p {

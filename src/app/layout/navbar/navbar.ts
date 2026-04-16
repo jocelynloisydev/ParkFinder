@@ -2,6 +2,7 @@ import { Component } from '@angular/core'
 import { AuthService } from '../../core/services/auth'
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router'
+import { ThemeService } from '../../core/services/theme'
 
 @Component({
   selector: 'app-navbar',
@@ -11,7 +12,7 @@ import { Router, RouterModule } from '@angular/router'
   styleUrl: './navbar.scss',
 })
 export class Navbar {
-  constructor(public auth: AuthService, private router: Router) {}
+  constructor(public auth: AuthService, private router: Router, public theme: ThemeService) {}
 
   async logout() {
     await this.auth.logout()

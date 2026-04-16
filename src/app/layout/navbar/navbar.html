@@ -3,6 +3,10 @@
     <h1 class="app-title">ParkFinder</h1>
   </div>
 
+  <button (click)="theme.toggle()">
+    {{ theme.theme() === 'light' ? '🌙' : '☀️' }}
+  </button>
+
   <div class="right">
     <button *ngIf="auth.user()" class="logout-btn" (click)="logout()">
       Déconnexion

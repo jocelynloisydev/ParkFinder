@@ -1,10 +1,28 @@
-// 🎨 Couleurs principales
-$color-primary: #0047AB;     // Bleu cobalt
-$color-secondary: #FF7A00;   // Orange
-$color-bg: #F5F5F5;
-$color-white: #FFFFFF;
-$color-black: #1A1A1A;
-$color-grey: #E0E0E0;
+// 🎨 Thème clair
+:root {
+  --color-primary: #0047AB;     // Bleu cobalt
+  --color-secondary: #FF7A00;   // Orange
+  --color-bg: #F5F5F5;
+  --color-surface: #FFFFFF;
+  --color-text: #1A1A1A;
+  --color-grey: #E0E0E0;
+  --color-hover-text: #FF7A00;
+
+  --shadow-soft: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+// 🌙 Thème sombre
+[data-theme="dark"] {
+  --color-primary: #3B82F6;
+  --color-secondary: #F59E0B;
+  --color-bg: #0D1117;
+  --color-surface: #161B22;
+  --color-text: #E5E7EB;
+  --color-grey: #333333;
+  --color-hover-text: #333333;
+
+  --shadow-soft: 0 4px 12px rgba(0, 0, 0, 0.45);
+}
 
 // 🧱 Espacements
 $space-xs: 4px;

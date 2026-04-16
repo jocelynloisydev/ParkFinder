@@ -3,6 +3,9 @@
   <!-- Header mobile (visible uniquement sur mobile) -->
   <header class="mobile-header">
     <h1 class="mobile-logo">ParkFinder</h1>
+    <button (click)="theme.toggle()">
+      {{ theme.theme() === 'light' ? '🌙' : '☀️' }}
+    </button>
   </header>
 
   <!-- Menu latéral -->
@@ -18,6 +21,9 @@
     </nav>
 
     <div class="app-links">
+      <button (click)="theme.toggle()">
+        {{ theme.theme() === 'light' ? '🌙' : '☀️' }}
+      </button>
       <p class="title">ParkFinder</p>
       <span class="subtitle">Plus de fonctionnalités dans l'application.</span>
 
