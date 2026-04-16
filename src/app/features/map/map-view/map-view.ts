@@ -3,6 +3,7 @@ import { ParksService } from '../../../core/services/parks'
 import { loadGoogleMaps } from '../../../core/utils/google-maps-loader';
 import { environment } from '../../../../environments/environment'
 import { NgIf } from '@angular/common';
+import { FavoritesService } from '../../../core/services/favorites';
 
 /// <reference types="@types/google.maps" />
 declare const google: any
@@ -21,7 +22,7 @@ export class MapView implements OnInit {
   infoWindow!: google.maps.InfoWindow
   desktopModeWarning = false
 
-  constructor(private parksService: ParksService) {}
+  constructor(private parksService: ParksService, private favoritesService: FavoritesService) {}
 
   // Détection du mode "Afficher le site de bureau" sur mobile
   private isMobileDesktopMode(): boolean {
@@ -56,9 +57,47 @@ export class MapView implements OnInit {
       })
 
       marker.addListener('gmp-click', () => {
-        this.infoWindow.setContent(`<b>${park.name}</b><br>${park.address ?? ''}`)
+        const isFav = this.favoritesService.isFavorite(park.id)
+
+        const html = `
+          <div style="display:flex;justify-content:space-between;align-items:center;width:200px;">
+            <div>
+              <b>${park.name}</b><br>
+              ${park.address ?? ''}
+            </div>
+            <div id="fav-${park.id}" style="font-size:22px;cursor:pointer;">
+              ${isFav ? '⭐' : '☆'}
+            </div>
+          </div>
+        `
+
+        this.infoWindow.setContent(html)
         this.infoWindow.open(this.map, marker)
         this.parksService.selectPark(park)
+
+        // Toggle favori
+        setTimeout(() => {
+          const favEl = document.getElementById(`fav-${park.id}`)
+          if (!favEl) return
+
+          favEl.addEventListener('click', () => {
+            const isFavNow = this.favoritesService.isFavorite(park.id)
+
+            if (isFavNow) {
+              this.favoritesService.removeFavorite(park.id)
+              favEl.innerHTML = '☆'
+            } else {
+              this.favoritesService.addFavorite({
+                id: park.id,
+                name: park.name,
+                lat: park.lat,
+                lng: park.lng,
+                address: park.address,
+              })
+              favEl.innerHTML = '⭐'
+            }
+          })
+        }, 50)
       })
 
       this.markers.push(marker)
