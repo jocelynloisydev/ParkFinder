@@ -1,8 +1,10 @@
-import { Component, effect, OnInit, signal } from '@angular/core'
+import { Component, effect, OnDestroy, OnInit, signal } from '@angular/core'
 import { ParksService } from '../../../core/services/parks'
 import { loadGoogleMaps } from '../../../core/utils/google-maps-loader';
 import { environment } from '../../../../environments/environment'
 import { NgIf } from '@angular/common';
+import { FavoritesService } from '../../../core/services/favorites';
+import { ThemeService } from '../../../core/services/theme';
 
 /// <reference types="@types/google.maps" />
 declare const google: any
@@ -14,14 +16,26 @@ declare const google: any
   styleUrl: './map-view.scss',
   imports: [NgIf],
 })
-export class MapView implements OnInit {
+export class MapView implements OnInit, OnDestroy {
   map!: google.maps.Map
   userPosition = signal<{ lat: number; lng: number } | null>(null)
   markers: google.maps.marker.AdvancedMarkerElement[] = []
   infoWindow!: google.maps.InfoWindow
   desktopModeWarning = false
 
-  constructor(private parksService: ParksService) {}
+  private parkMarkers: google.maps.marker.AdvancedMarkerElement[] = []
+  private userMarker?: google.maps.marker.AdvancedMarkerElement
+  private resizeListener?: () => void
+  private mapReady = signal(false)
+
+  // Map ID cloud
+  private readonly MAP_ID = '20e9edcccea5d503e0899089'
+
+  constructor(
+    private parksService: ParksService,
+    private favoritesService: FavoritesService,
+    private theme: ThemeService
+  ) {}
 
   // Détection du mode "Afficher le site de bureau" sur mobile
   private isMobileDesktopMode(): boolean {
@@ -46,23 +60,112 @@ export class MapView implements OnInit {
 
     this.markers.forEach(m => (m.map = null))
     this.markers = []
+    this.parkMarkers = []
 
     parks.forEach(park => {
       const marker = new google.maps.marker.AdvancedMarkerElement({
         map: this.map,
         position: { lat: park.lat, lng: park.lng },
         title: park.name,
-        content: this.createCustomIcon('assets/icons/parc-icon.png'),
+        content: this.createCustomIcon(
+          this.theme.theme() === 'dark'
+            ? 'assets/icons/map/park-dark.png'
+            : 'assets/icons/map/parc-icon.png'
+        ),
       })
 
       marker.addListener('gmp-click', () => {
-        this.infoWindow.setContent(`<b>${park.name}</b><br>${park.address ?? ''}`)
+        const isFav = this.favoritesService.isFavorite(park.id)
+
+        const html = `
+          <div style="display:flex;justify-content:space-between;align-items:center;width:200px;">
+            <div>
+              <b>${park.name}</b><br>
+              ${park.address ?? ''}
+            </div>
+            <div id="fav-${park.id}" style="font-size:22px;cursor:pointer;">
+              ${isFav ? '⭐' : '☆'}
+            </div>
+          </div>
+        `
+
+        this.infoWindow.setContent(html)
         this.infoWindow.open(this.map, marker)
         this.parksService.selectPark(park)
+
+        // Toggle favori
+        setTimeout(() => {
+          const favEl = document.getElementById(`fav-${park.id}`)
+          if (!favEl) return
+
+          favEl.addEventListener('click', () => {
+            const isFavNow = this.favoritesService.isFavorite(park.id)
+
+            if (isFavNow) {
+              this.favoritesService.removeFavorite(park.id)
+              favEl.innerHTML = '☆'
+            } else {
+              this.favoritesService.addFavorite({
+                id: park.id,
+                name: park.name,
+                lat: park.lat,
+                lng: park.lng,
+                address: park.address,
+              })
+              favEl.innerHTML = '⭐'
+            }
+          })
+        }, 50)
       })
 
       this.markers.push(marker)
+      this.parkMarkers.push(marker)
     })
+  })
+
+  // Recrée la carte quand le thème change
+  mapThemeEffect = effect(() => {
+    const mode = this.theme.theme()
+    if (!this.mapReady()) return
+
+    const center = this.map.getCenter() ?? { lat: 46.67, lng: 5.22 }
+    const zoom = this.map.getZoom() ?? 13
+
+    this.parkMarkers.forEach(m => (m.map = null))
+    if (this.userMarker) this.userMarker.map = null
+
+    this.map = new google.maps.Map(
+      document.getElementById('map') as HTMLElement,
+      {
+        center,
+        zoom,
+        mapId: this.MAP_ID,
+        colorScheme: mode === 'dark' ? google.maps.ColorScheme.DARK : google.maps.ColorScheme.LIGHT,
+      } as any
+    )
+
+    this.parkMarkers.forEach(m => (m.map = this.map))
+    if (this.userMarker) this.userMarker.map = this.map
+
+    this.infoWindow = new google.maps.InfoWindow()
+  })
+
+  markerThemeEffect = effect(() => {
+    const mode = this.theme.theme()
+
+    const parkIcon =
+      mode === 'dark' ? 'assets/icons/map/park-dark.png' : 'assets/icons/map/parc-icon.png'
+
+    const userIcon =
+      mode === 'dark' ? 'assets/icons/map/user-dark.png' : 'assets/icons/map/user-light.png'
+
+    this.parkMarkers.forEach(marker => {
+      marker.content = this.createCustomIcon(parkIcon)
+    })
+
+    if (this.userMarker) {
+      this.userMarker.content = this.createCustomIcon(userIcon)
+    }
   })
 
   async ngOnInit(): Promise<void> {
@@ -79,6 +182,12 @@ export class MapView implements OnInit {
     }
   }
 
+  ngOnDestroy(): void {
+    if (this.resizeListener) {
+      window.removeEventListener('resize', this.resizeListener)
+    }
+  }
+
   // Attendre que le layout soit stabilisé
   private initMapAfterDomReady() {
     requestAnimationFrame(() => {
@@ -89,23 +198,28 @@ export class MapView implements OnInit {
           return
         }
 
-        this.initMap()
+        this.initMap(this.theme.theme())
         this.infoWindow = new google.maps.InfoWindow()
         this.locateUser()
       })
     })
   }
 
-  initMap() {
-    this.map = new google.maps.Map(document.getElementById('map') as HTMLElement, {
-      center: { lat: 46.67, lng: 5.22 },
-      zoom: 13,
-      mapId: 'DEMO_MAP_ID',
-    })
+  initMap(mode: 'light' | 'dark') {
+    this.map = new google.maps.Map(
+      document.getElementById('map') as HTMLElement,
+      {
+        center: { lat: 46.67, lng: 5.22 },
+        zoom: 13,
+        mapId: this.MAP_ID,
+        colorScheme: mode === 'dark' ? google.maps.ColorScheme.DARK : google.maps.ColorScheme.LIGHT,
+      } as any
+    )
 
-    window.addEventListener('resize', () => {
-      this.forceMapStabilization()
-    })
+    this.mapReady.set(true)
+
+    this.resizeListener = () => this.forceMapStabilization()
+    window.addEventListener('resize', this.resizeListener)
   }
 
   locateUser() {
@@ -122,11 +236,15 @@ export class MapView implements OnInit {
       this.map.setZoom(15)
 
       // Marqueur utilisateur
-      new google.maps.marker.AdvancedMarkerElement({
+      this.userMarker = new google.maps.marker.AdvancedMarkerElement({
         map: this.map,
         position: { lat: latitude, lng: longitude },
         title: 'Vous êtes ici',
-        content: this.createCustomIcon('assets/icons/user-icon.png'),
+        content: this.createCustomIcon(
+          this.theme.theme() === 'dark'
+            ? 'assets/icons/map/user-dark.png'
+            : 'assets/icons/map/user-light.png'
+        ),
       })
 
       // Récupération des parcs, charge les parcs dans le signal
@@ -136,14 +254,9 @@ export class MapView implements OnInit {
 
   private forceMapStabilization() {
     if (!this.map) return
-
     const center = this.map.getCenter()
     google.maps.event.trigger(this.map, 'resize')
-
     if (center) this.map.setCenter(center)
-
-    const zoom = this.map.getZoom()
-    if (zoom) this.map.setZoom(zoom)
   }
 
   // Génère un élément HTML pour les icônes personnalisées

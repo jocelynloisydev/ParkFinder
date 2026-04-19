@@ -3,6 +3,15 @@
     <h1 class="app-title">ParkFinder</h1>
   </div>
 
+  <button class="darkmode-btn" (click)="theme.toggle()">
+    <img
+      [src]="theme.theme() === 'light' ? 'assets/icons/interface/mode-sombre.png' : 'assets/icons/interface/mode-jour.png'"
+      alt="Changer le thème"
+      width="26"
+      height="26"
+    />
+  </button>
+
   <div class="right">
     <button *ngIf="auth.user()" class="logout-btn" (click)="logout()">
       Déconnexion

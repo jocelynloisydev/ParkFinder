@@ -3,6 +3,14 @@
   <!-- Header mobile (visible uniquement sur mobile) -->
   <header class="mobile-header">
     <h1 class="mobile-logo">ParkFinder</h1>
+    <button class="darkmode-btn" (click)="theme.toggle()">
+      <img
+        [src]="theme.theme() === 'light' ? 'assets/icons/interface/mode-sombre.png' : 'assets/icons/interface/mode-jour.png'"
+        alt="Changer le thème"
+        width="26"
+        height="26"
+      />
+    </button>
   </header>
 
   <!-- Menu latéral -->
@@ -18,6 +26,15 @@
     </nav>
 
     <div class="app-links">
+      <button class="darkmode-btn" (click)="theme.toggle()">
+        <img
+          [src]="theme.theme() === 'light' ? 'assets/icons/interface/mode-sombre.png' : 'assets/icons/interface/mode-jour.png'"
+          alt="Changer le thème"
+          width="26"
+          height="26"
+        />
+      </button>
+      <br>
       <p class="title">ParkFinder</p>
       <span class="subtitle">Plus de fonctionnalités dans l'application.</span>
 

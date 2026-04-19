@@ -8,7 +8,7 @@
 
 h2 {
   margin-bottom: $space-lg;
-  color: $color-primary;
+  color: var(--color-primary);
 }
 
 input {
@@ -16,8 +16,9 @@ input {
   padding: $space-md;
   margin-bottom: $space-md;
   border-radius: $radius;
-  border: 1px solid $color-grey;
+  border: 1px solid var(--color-grey);
   font-size: 1rem;
+  background-color: var(--color-grey);
 }
 
 button.primary {

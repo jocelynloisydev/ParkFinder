@@ -2,39 +2,41 @@
 
 // 🧩 Carte
 @mixin card {
-  background: $color-white;
+  background: var(--color-surface);
   border-radius: $radius;
-  box-shadow: $shadow-soft;
+  box-shadow: var(--shadow-soft);
   padding: $space-lg;
 }
 
 // 🔘 Bouton principal
 @mixin button-primary {
-  background: $color-secondary;
-  color: $color-white;
+  background: var(--color-secondary);
+  color: var(--color-surface);
   border: none;
   border-radius: $radius;
   padding: $space-md $space-lg;
   cursor: pointer;
   font-weight: 600;
   transition: 0.2s;
+
   &:hover {
-    background: darken($color-secondary, 10%);
+    background: color-mix(in srgb, var(--color-secondary) 80%, black);
   }
 }
 
 // 🔘 Bouton outline
 @mixin button-outline {
   background: transparent;
-  border: 2px solid $color-primary;
-  color: $color-primary;
+  border: 2px solid var(--color-primary);
+  color: var(--color-primary);
   border-radius: $radius;
   padding: $space-md $space-lg;
   cursor: pointer;
   font-weight: 600;
   transition: 0.2s;
+
   &:hover {
-    background: rgba($color-primary, 0.1);
+    background: color-mix(in srgb, var(--color-primary) 10%, transparent);
   }
 }
 
