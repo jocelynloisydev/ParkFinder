@@ -5,6 +5,7 @@ import { environment } from '../../../../environments/environment'
 import { NgIf } from '@angular/common';
 import { FavoritesService } from '../../../core/services/favorites';
 import { ThemeService } from '../../../core/services/theme';
+import { UserLocationService } from '../../../core/services/user-location'
 
 /// <reference types="@types/google.maps" />
 declare const google: any
@@ -34,7 +35,8 @@ export class MapView implements OnInit, OnDestroy {
   constructor(
     private parksService: ParksService,
     private favoritesService: FavoritesService,
-    private theme: ThemeService
+    private theme: ThemeService,
+    private userLocation: UserLocationService
   ) {}
 
   // Détection du mode "Afficher le site de bureau" sur mobile
@@ -229,7 +231,7 @@ export class MapView implements OnInit, OnDestroy {
       const { latitude, longitude } = pos.coords
 
       // Mise à jour du signal
-      this.userPosition.set({ lat: latitude, lng: longitude })
+      this.userLocation.setPosition(latitude, longitude)
 
       // Centrage de la carte
       this.map.setCenter({ lat: latitude, lng: longitude })
