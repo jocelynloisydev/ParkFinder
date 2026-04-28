@@ -1,4 +1,4 @@
-import { Component, effect, OnDestroy, OnInit, signal } from '@angular/core'
+import { Component, effect, OnDestroy, OnInit, signal, untracked } from '@angular/core'
 import { ParksService } from '../../../core/services/parks'
 import { loadGoogleMaps } from '../../../core/utils/google-maps-loader';
 import { environment } from '../../../../environments/environment'
@@ -6,6 +6,8 @@ import { NgIf } from '@angular/common';
 import { FavoritesService } from '../../../core/services/favorites';
 import { ThemeService } from '../../../core/services/theme';
 import { UserLocationService } from '../../../core/services/user-location'
+import { FilterService } from '../../../core/services/filter'
+import { distanceKm } from '../../../core/utils/distance'
 
 /// <reference types="@types/google.maps" />
 declare const google: any
@@ -19,7 +21,6 @@ declare const google: any
 })
 export class MapView implements OnInit, OnDestroy {
   map!: google.maps.Map
-  userPosition = signal<{ lat: number; lng: number } | null>(null)
   markers: google.maps.marker.AdvancedMarkerElement[] = []
   infoWindow!: google.maps.InfoWindow
   desktopModeWarning = false
@@ -27,6 +28,7 @@ export class MapView implements OnInit, OnDestroy {
   private parkMarkers: google.maps.marker.AdvancedMarkerElement[] = []
   private userMarker?: google.maps.marker.AdvancedMarkerElement
   private resizeListener?: () => void
+  private keydownListener?: (e: KeyboardEvent) => void
   private mapReady = signal(false)
 
   // Map ID cloud
@@ -36,7 +38,8 @@ export class MapView implements OnInit, OnDestroy {
     private parksService: ParksService,
     private favoritesService: FavoritesService,
     private theme: ThemeService,
-    private userLocation: UserLocationService
+    private userLocation: UserLocationService,
+    public filters: FilterService
   ) {}
 
   // Détection du mode "Afficher le site de bureau" sur mobile
@@ -70,7 +73,7 @@ export class MapView implements OnInit, OnDestroy {
         position: { lat: park.lat, lng: park.lng },
         title: park.name,
         content: this.createCustomIcon(
-          this.theme.theme() === 'dark'
+          untracked(() => this.theme.theme()) === 'dark'
             ? 'assets/icons/map/park-dark.png'
             : 'assets/icons/map/parc-icon.png'
         ),
@@ -80,7 +83,7 @@ export class MapView implements OnInit, OnDestroy {
         const isFav = this.favoritesService.isFavorite(park.id)
 
         const html = `
-          <div style="display:flex;justify-content:space-between;align-items:center;width:200px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;width:200px;color:#1A1A1A;">
             <div>
               <b>${park.name}</b><br>
               ${park.address ?? ''}
@@ -123,6 +126,39 @@ export class MapView implements OnInit, OnDestroy {
       this.markers.push(marker)
       this.parkMarkers.push(marker)
     })
+
+    // Applique le filtre de distance dès le chargement
+    this.applyRadiusFilter()
+  })
+
+  radiusEffect = effect(() => {
+    const radius = this.filters.maxDistance()
+    if (!this.map || !this.mapReady) return
+
+    const user = this.userLocation.userPosition()
+
+    // Ajustement du zoom selon le rayon
+    const zoomMap: Record<number, number> = {
+      1: 14.1,
+      2: 12.9,
+      3: 12.5,
+      4: 12.2,
+      5: 11.7,
+      6: 11.3,
+      7: 11.1,
+      8: 10.9,
+      9: 10.7,
+      10: 10.5,
+    }
+
+    // Affiche/masque les marqueurs selon le rayon
+    this.applyRadiusFilter()
+
+    if (user) {
+      this.map.setCenter({ lat: user.lat, lng: user.lng })
+    }
+
+    this.map.setZoom(zoomMap[radius] ?? 12)
   })
 
   // Recrée la carte quand le thème change
@@ -146,9 +182,10 @@ export class MapView implements OnInit, OnDestroy {
       } as any
     )
 
-    this.parkMarkers.forEach(m => (m.map = this.map))
-    if (this.userMarker) this.userMarker.map = this.map
+    // Réapplique le filtre au lieu de tout réattacher
+    untracked(() => this.applyRadiusFilter())
 
+    if (this.userMarker) this.userMarker.map = this.map
     this.infoWindow = new google.maps.InfoWindow()
   })
 
@@ -182,11 +219,20 @@ export class MapView implements OnInit, OnDestroy {
     } catch (err) {
       console.error('Google Maps failed to load', err)
     }
+
+    this.keydownListener = (e: KeyboardEvent) => {
+      if (e.key === '+') this.incrementRadius()
+      if (e.key === '-') this.decrementRadius()
+    }
+    window.addEventListener('keydown', this.keydownListener)
   }
 
   ngOnDestroy(): void {
     if (this.resizeListener) {
       window.removeEventListener('resize', this.resizeListener)
+    }
+    if (this.keydownListener) {
+      window.removeEventListener('keydown', this.keydownListener)
     }
   }
 
@@ -235,7 +281,7 @@ export class MapView implements OnInit, OnDestroy {
 
       // Centrage de la carte
       this.map.setCenter({ lat: latitude, lng: longitude })
-      this.map.setZoom(15)
+      this.map.setZoom(14.1)
 
       // Marqueur utilisateur
       this.userMarker = new google.maps.marker.AdvancedMarkerElement({
@@ -250,7 +296,7 @@ export class MapView implements OnInit, OnDestroy {
       })
 
       // Récupération des parcs, charge les parcs dans le signal
-      this.parksService.loadParks(latitude, longitude)
+      this.parksService.loadParks(latitude, longitude, 10000)
     })
   }
 
@@ -259,6 +305,34 @@ export class MapView implements OnInit, OnDestroy {
     const center = this.map.getCenter()
     google.maps.event.trigger(this.map, 'resize')
     if (center) this.map.setCenter(center)
+  }
+
+  incrementRadius() {
+    const current = this.filters.maxDistance()
+    if (current < 10) this.filters.setMaxDistance(current + 1)
+  }
+
+  decrementRadius() {
+    const current = this.filters.maxDistance()
+    if (current > 1) this.filters.setMaxDistance(current - 1)
+  }
+
+  private applyRadiusFilter() {
+    const user = this.userLocation.userPosition()
+    const radius = this.filters.maxDistance()
+    if (!user) return
+
+    this.parkMarkers.forEach((marker, index) => {
+      const park = this.parksService.parks()[index]
+      if (!park) return
+      const dist = distanceKm(user.lat, user.lng, park.lat, park.lng)
+      const shouldShow = dist <= radius
+      const isShown = marker.map === this.map
+
+      // Ne touche au marqueur que si son état doit changer
+      if (shouldShow && !isShown) marker.map = this.map
+      if (!shouldShow && isShown) marker.map = undefined
+    })
   }
 
   // Génère un élément HTML pour les icônes personnalisées

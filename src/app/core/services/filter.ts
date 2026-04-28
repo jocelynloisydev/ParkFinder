@@ -6,13 +6,13 @@ export class FilterService {
   showFavorites = signal(false)
 
   // Filtre distance (en km)
-  maxDistance = signal<number | null>(null)
+  maxDistance = signal<number>(1)
 
   toggleFavorites() {
     this.showFavorites.update(v => !v)
   }
 
-  setMaxDistance(km: number | null) {
+  setMaxDistance(km: number) {
     this.maxDistance.set(km)
   }
 }

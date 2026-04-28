@@ -32,3 +32,20 @@
   opacity: 0.7;
   margin-top: 2px;
 }
+
+.distance-filter {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 12px;
+
+  label {
+    font-size: 14px;
+    color: var(--text-secondary);
+  }
+
+  input[type="range"] {
+    width: 100%;
+  }
+}
+

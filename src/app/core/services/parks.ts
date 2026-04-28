@@ -8,7 +8,7 @@ export class ParksService {
   parks = signal<any[]>([])
   selectedPark = signal<any | null>(null)
 
-  async loadParks(lat: number, lng: number) {
+  async loadParks(lat: number, lng: number, radius: number = 10000) {
     const apiKey = environment.google.placesApiKey
 
     const url = `https://places.googleapis.com/v1/places:searchNearby`
@@ -19,7 +19,7 @@ export class ParksService {
       locationRestriction: {
         circle: {
           center: { latitude: lat, longitude: lng },
-          radius: 2000,
+          radius: radius,
         },
       },
     }
