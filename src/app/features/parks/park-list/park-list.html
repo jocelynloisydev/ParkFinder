@@ -1,10 +1,35 @@
-<!--
-<mat-list>
-  <mat-list-item
-    *ngFor="let park of parksService.parks()"
+<div class="filters">
+  <button (click)="filters.toggleFavorites()">
+    {{ filters.showFavorites() ? 'Afficher tous' : 'Afficher favoris' }}
+  </button>
+
+  <div class="distance-filter">
+    <label>Rayon : {{ filters.maxDistance() ?? '∞' }} km</label>
+    <input
+      type="range"
+      min="1"
+      max="30"
+      step="1"
+      [value]="filters.maxDistance() ?? 10"
+      (input)="filters.setMaxDistance($any($event.target).value)"
+    />
+  </div>
+
+  <button (click)="filters.setMaxDistance(1)">
+    Sans filtre distance
+  </button>
+</div>
+
+<div class="park-list">
+  <div
+    class="park-item"
+    *ngFor="let park of parksFiltered()"
     (click)="selectPark(park)"
   >
-    {{ park.name }}
-  </mat-list-item>
-</mat-list>
--->
+    <div class="park-name">{{ park.name }}</div>
+    <div class="park-address" *ngIf="park.address">{{ park.address }}</div>
+    <div class="park-distance" *ngIf="park.distance">
+      {{ park.distance | number:'1.1-1' }} km
+    </div>
+  </div>
+</div>

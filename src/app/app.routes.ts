@@ -51,5 +51,11 @@ export const routes: Routes = [
           import('./features/map/map-view/map-view').then(m => m.MapView)
       }
     ]
+  },
+
+  {
+    path: 'sandbox',
+    loadComponent: () => import('./sandbox/sandbox').then(m => m.Sandbox),
   }
+
 ]

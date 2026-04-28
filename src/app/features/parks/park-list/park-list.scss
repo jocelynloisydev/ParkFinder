@@ -1,0 +1,51 @@
+.park-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+}
+
+.park-item {
+  padding: 12px 14px;
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+
+  &:hover {
+    background: color-mix(in srgb, var(--surface) 90%, var(--primary) 10%);
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
+.park-name {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.park-address {
+  font-size: 13px;
+  opacity: 0.7;
+  margin-top: 2px;
+}
+
+.distance-filter {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 12px;
+
+  label {
+    font-size: 14px;
+    color: var(--text-secondary);
+  }
+
+  input[type="range"] {
+    width: 100%;
+  }
+}
+

@@ -8,4 +8,13 @@
 
 <div class="map-container">
   <div id="map"></div>
+
+  <div class="map-filter-panel">
+    <span class="filter-label">Rayon de recherche</span>
+    <div class="radius-controls">
+      <button (click)="decrementRadius()" [disabled]="filters.maxDistance() === 1">−</button>
+      <span class="radius-value">{{ filters.maxDistance() }} km</span>
+      <button (click)="incrementRadius()" [disabled]="filters.maxDistance() === 10">+</button>
+    </div>
+  </div>
 </div>
